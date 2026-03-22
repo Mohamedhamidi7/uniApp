@@ -21,15 +21,21 @@ public class Subject {
     @JoinColumn(name = "server_id")
     private Server server;
     @OneToMany(
-            mappedBy = "subject"
+            mappedBy = "subject",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Deck> decks;
     @OneToMany(
-            mappedBy = "subject"
+            mappedBy = "subject",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Post> posts;
     @OneToMany(
-            mappedBy = "subject"
+            mappedBy = "subject",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Folder> folders;
 }

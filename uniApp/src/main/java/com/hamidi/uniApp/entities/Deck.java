@@ -24,7 +24,9 @@ public class Deck {
     )
     private Subject subject;
     @OneToMany(
-            mappedBy = "deck"
+            mappedBy = "deck",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Card> cards;
 

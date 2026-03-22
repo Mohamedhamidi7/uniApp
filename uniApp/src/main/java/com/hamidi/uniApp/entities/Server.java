@@ -20,7 +20,9 @@ public class Server {
     @ManyToMany(mappedBy = "servers")
     private List<User> users;
     @OneToMany(
-            mappedBy = "server"
+            mappedBy = "server",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Subject> subjects;
 }

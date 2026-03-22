@@ -23,7 +23,9 @@ public class Folder {
     )
     private Subject subject;
     @OneToMany(
-            mappedBy = "folder"
+            mappedBy = "folder",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<Resource> resources;
 }

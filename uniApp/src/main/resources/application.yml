@@ -15,5 +15,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   security:
     user:
-      name: admin
-      password: admin
+      name: "admin"
+      password: "admin"
