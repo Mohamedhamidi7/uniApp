@@ -1,10 +1,6 @@
-package entities;
+package com.hamidi.uniApp.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +16,9 @@ public class Card {
     private String question;
     private String answer;
 
-    @Autowired
+    @ManyToOne
+    @JoinColumn(
+            name = "deck_id"
+    )
     private Deck deck;
 }

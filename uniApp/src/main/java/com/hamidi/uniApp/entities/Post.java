@@ -1,9 +1,5 @@
-package entities;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.springframework.beans.factory.annotation.Autowired;
+package com.hamidi.uniApp.entities;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +15,9 @@ public class Post {
     private String title;
     private String content;
 
-    @Autowired
+    @ManyToOne
+    @JoinColumn(
+            name = "subject_id"
+    )
     private Subject subject;
 }

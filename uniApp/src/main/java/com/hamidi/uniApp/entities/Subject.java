@@ -1,12 +1,8 @@
-package entities;
+package com.hamidi.uniApp.entities;
 
 import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,12 +17,19 @@ public class Subject {
     private Integer id;
     private String name;
 
-    @Autowired
+    @ManyToOne
+    @JoinColumn(name = "server_id")
     private Server server;
-    @Autowired
+    @OneToMany(
+            mappedBy = "subject"
+    )
     private List<Deck> decks;
-    @Autowired
+    @OneToMany(
+            mappedBy = "subject"
+    )
     private List<Post> posts;
-    @Autowired
+    @OneToMany(
+            mappedBy = "subject"
+    )
     private List<Folder> folders;
 }
