@@ -15,4 +15,8 @@ public class UserService {
     public User createUser(User user){
         return userRepository.save(user);
     }
+
+    public User getUser(Integer user_id){
+        return userRepository.getReferenceById(user_id);
+    }
 }

@@ -1,12 +1,10 @@
 package com.hamidi.uniApp.entities;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,10 +12,7 @@ import org.springframework.stereotype.Component;
 @Table(
         name = "users"
 )
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class User {
 
     @Id
@@ -53,5 +48,5 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "server_id")
     )
-    private List<Server> servers;
+    private List<Server> servers = new LinkedList<>();
 }

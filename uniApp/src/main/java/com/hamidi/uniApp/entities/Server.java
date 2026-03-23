@@ -1,8 +1,12 @@
 package com.hamidi.uniApp.entities;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Table(
         name = "servers"
 )
+@Data
 public class Server {
 
     @Id
@@ -18,11 +23,11 @@ public class Server {
     private String name;
 
     @ManyToMany(mappedBy = "servers")
-    private List<User> users;
+    private List<User> users = new LinkedList<>();
     @OneToMany(
             mappedBy = "server",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Subject> subjects;
+    private List<Subject> subjects = new LinkedList<>();
 }

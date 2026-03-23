@@ -3,6 +3,7 @@ package com.hamidi.uniApp.entities;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Table(
         name = "subjects"
 )
+@Data
 public class Subject {
 
     @Id
