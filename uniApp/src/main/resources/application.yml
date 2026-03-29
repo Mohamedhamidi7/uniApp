@@ -13,7 +13,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  security:
-    user:
-      name: "admin"
-      password: "admin"
+#  security:
+#    user:
+#      name: "admin"
+#      password: "admin"
