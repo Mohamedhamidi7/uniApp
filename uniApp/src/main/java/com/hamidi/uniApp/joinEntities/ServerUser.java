@@ -4,14 +4,13 @@ import com.hamidi.uniApp.ServerRole;
 import com.hamidi.uniApp.entities.AppUser;
 import com.hamidi.uniApp.entities.Server;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class ServerUser {
     @Id
