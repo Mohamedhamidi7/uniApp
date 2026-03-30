@@ -1,6 +1,7 @@
 package com.hamidi.uniApp.entities;
 
-import com.hamidi.uniApp.Role;
+import com.hamidi.uniApp.AppRole;
+import com.hamidi.uniApp.joinEntities.ServerUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import lombok.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -63,8 +65,9 @@ public class AppUser {
     @Builder.Default
     private boolean enabled = false;
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Role role = Role.USER;
+    private AppRole role = AppRole.USER;
 
     @Column(
             nullable = false
@@ -74,4 +77,7 @@ public class AppUser {
     private void onCreate(){
         createdAt = Instant.now();
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ServerUser> serverUser;
 }

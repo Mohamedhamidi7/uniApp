@@ -1,5 +1,5 @@
 package com.hamidi.uniApp;
 
-public enum Role {
+public enum AppRole {
     ADMIN, USER
 }

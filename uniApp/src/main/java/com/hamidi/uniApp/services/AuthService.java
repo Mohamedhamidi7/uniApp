@@ -8,10 +8,12 @@ import com.hamidi.uniApp.repositories.AppUserRepo;
 import com.hamidi.uniApp.security.CustomUserDetails;
 import com.hamidi.uniApp.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class AuthService {
 
     public AuthResponce register(RegisterRequest request){
         if (appUserRepo.existsByUsername(request.username())) {
-            throw new RuntimeException("Username already exists");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE);
         }
 
         AppUser user = AppUser.builder()
@@ -53,7 +55,7 @@ public class AuthService {
         );
 
         AppUser user = appUserRepo.findByUsername(request.username())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE));
 
         String jwt = jwtService.generateToken(new CustomUserDetails(user));
 
