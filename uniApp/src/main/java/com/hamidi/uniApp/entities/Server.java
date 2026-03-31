@@ -23,7 +23,8 @@ public class Server {
 
     @NotBlank
     @Column(
-            nullable = false
+            nullable = false,
+            unique = true
     )
     private String name;
 

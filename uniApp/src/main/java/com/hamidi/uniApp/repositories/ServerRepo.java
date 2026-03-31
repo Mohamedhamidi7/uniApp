@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ServerRepo extends JpaRepository<Server, Integer> {
-
-    public List<Server> findAllById(Integer username);
+    public Optional<Server> findByName(String Name);
+//    public List<Server> findAllById(Integer username);
 
 }

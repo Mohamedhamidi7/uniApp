@@ -1,4 +1,4 @@
-package com.hamidi.uniApp.dtos.responces;
+package com.hamidi.uniApp.dtos;
 
 public record ServerDTO (
         String name,
