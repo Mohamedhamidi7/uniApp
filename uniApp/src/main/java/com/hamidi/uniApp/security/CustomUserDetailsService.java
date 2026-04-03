@@ -3,7 +3,6 @@ package com.hamidi.uniApp.security;
 import com.hamidi.uniApp.entities.AppUser;
 import com.hamidi.uniApp.repositories.AppUserRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;

@@ -1,9 +1,9 @@
 package com.hamidi.uniApp.entities;
 
 
+import com.hamidi.uniApp.dtos.ServerDTO;
 import com.hamidi.uniApp.joinEntities.ServerUser;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -44,5 +44,12 @@ public class Server {
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL)
     private List<ServerUser> serverUsers;
+
+    public ServerDTO toDTO(){
+        return new ServerDTO(
+                this.getName(),
+                this.getDescription()
+        );
+    }
 
 }

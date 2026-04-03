@@ -1,18 +1,19 @@
 package com.hamidi.uniApp.services;
 
+import com.hamidi.uniApp.CONVERTER;
 import com.hamidi.uniApp.ServerRole;
 import com.hamidi.uniApp.dtos.ServerDTO;
+import com.hamidi.uniApp.dtos.ServerMemberDTO;
 import com.hamidi.uniApp.entities.AppUser;
 import com.hamidi.uniApp.entities.Server;
-import com.hamidi.uniApp.helpers.SWITCHER;
+import com.hamidi.uniApp.exeptions.NotFound;
 import com.hamidi.uniApp.joinEntities.ServerUser;
 import com.hamidi.uniApp.repositories.AppUserRepo;
 import com.hamidi.uniApp.repositories.ServerRepo;
 import com.hamidi.uniApp.repositories.ServerUserRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.List;
 
@@ -20,74 +21,169 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ServerService {
 
-    private final ServerUserService serverUserService; //3
-    private final AppUserService appUserService; //2
-    private final ServerRepo serverRepo;
-    private final AppUserRepo appUserRepo;
-    private final ServerUserRepo serverUserRepo;
+    public final AppUserRepo appUserRepo;
+    public final ServerRepo serverRepo;
+    public final ServerUserRepo serverUserRepo;
 
-    public Integer getIdOf(String name){
-        return getServer(name).getId();
+    public AppUser getUser(String username){
+        return appUserRepo.findByUsername(username)
+                .orElseThrow(()->new NotFound("user_id"));
+    }
+    public Server getServer(String serverName){
+        return serverRepo.findByName(serverName)
+                .orElseThrow(()->new NotFound("user_id"));
+    }
+    public Integer getUserId(String username){
+        return getUser(username).getId();
+    }
+    public Integer getServerId(String serverName){
+        return getServer(serverName).getId();
+    }
+    public boolean isAllowed(String username, String serverName, List<ServerRole> role){
+        return serverUserRepo.existsByUser_idAndServer_idAndRoleIn(
+                getUserId(username),
+                getServerId(serverName),
+                role
+        );
     }
 
-    public Server getServer(Integer id){
-        return serverRepo.findById(id)
-                .orElseThrow(()->new UsernameNotFoundException("Server Not Found"));
-    }
-    public Server getServer(String name){
-        return serverRepo.findByName(name)
-                .orElseThrow(()->new UsernameNotFoundException("Server Not Found"));
+    public ServerDTO getServerByName(String serverName) {
+        return serverRepo.findByName(serverName)
+                .orElseThrow(()->new NotFound("Server Not found!"))
+                .toDTO();
     }
 
-    public void createServer(ServerDTO request, String username){
+    public List<ServerDTO> getEnteredServers(String username) {
+        Integer user_id = getUserId(username);
+        List<Server> user_servers = serverUserRepo.findAllByUser_id(user_id)
+                .stream()
+                .map(ServerUser::getServer)
+                .toList();
+        return user_servers.stream()
+                .map(Server::toDTO)
+                .toList();
+    }
 
-        AppUser user = appUserService.getUser(username);
+    public List<ServerMemberDTO> getServerMembers(String user, String serverName) {
+        Integer user_id = getUserId(user);
+        Integer server_id = getServerId(serverName);
+        boolean isMember = serverUserRepo.existsByUser_idAndServer_id(user_id,server_id);
+        if (isMember)
+            return serverUserRepo.findAllByServer_id(server_id).stream()
+                    .map(e->{
+                        return CONVERTER.toDTO(
+                                e.getUser(),
+                                e.getRole()
+                        );
+                    })
+                    .toList();
+        else
+            return serverUserRepo.findAllByServer_idAndRoleIn(
+                    server_id,
+                    List.of(ServerRole.OWNER, ServerRole.CONTROLLER)
+            ).stream()
+                    .map(e->{
+                        return CONVERTER.toDTO(
+                                e.getUser(),
+                                e.getRole()
+                        );
+                    })
+                    .toList();
+    }
 
-        Server server = Server.builder()
+    public boolean addUserToServer(String username, String serverName, String invitedUsername) {
+        Integer user_id = getUserId(username);
+        Integer invited_id = getUserId(invitedUsername);
+        Integer server_id = getServerId(serverName);
+
+        boolean isAllowed = isAllowed(
+                username,
+                serverName,
+                List.of(ServerRole.OWNER, ServerRole.CONTROLLER)
+        );
+
+        boolean isMember = serverUserRepo.existsByUser_idAndServer_id(invited_id,server_id);
+
+        if (isAllowed && !isMember){
+            serverUserRepo.save(
+                    ServerUser.builder()
+                            .user(getUser(invitedUsername))
+                            .server(getServer(serverName))
+                            .role(ServerRole.MEMBER)
+                            .build()
+            );
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean createServer(String username, @NonNull ServerDTO request) {
+        if(serverRepo.existsByName(request.name()))
+            return false;
+        Server newServer = Server.builder()
                 .name(request.name())
                 .description(request.description())
                 .build();
 
+        AppUser user = getUser(username);
         ServerUser serverUser = ServerUser.builder()
                 .user(user)
-                .server(server)
+                .server(newServer)
                 .role(ServerRole.OWNER)
                 .build();
 
-        serverRepo.save(server);
+        serverRepo.save(newServer);
         serverUserRepo.save(serverUser);
-
+        return true;
     }
 
-    public List<ServerDTO> getServers(String username){
-        return serverUserService.getServersOf(
-                    appUserService.getIdOf(username)
-                )
-                .stream()
-                .map(SWITCHER::fromSERVERtoSERVERDTO)
-                .toList();
-    }
-//    public ServerDTO getServer(String name){
-//
-//    }
+    public boolean updateServer(String username,String serverName, ServerDTO request) {
+        boolean isAllowed = isAllowed(
+                username,
+                serverName,
+                List.of(ServerRole.OWNER)
+        );
 
-    public boolean updateServerInfo(ServerDTO request, String username, String targetName) {
-       Integer user_id = appUserService.getIdOf(username);
-       Server update = serverUserService.getServersOf(user_id).stream()
-               .filter(e -> e.getName().equals(targetName))
-               .toList()
-               .get(0);
-       Integer server_id = update.getId();
-       ServerRole role = serverUserService.getRoleBetween(user_id, server_id);
-       boolean isMatched = ( role == ServerRole.OWNER ) ||  ( role == ServerRole.EDITOR );
-       if ( isMatched ){
-           update.setName(request.name());
-           if (!request.description().isBlank())
-               update.setDescription(request.name());;
-           serverRepo.save(update);
-           return true;
-       }
-       return false;
+        if (!isAllowed)
+            return false;
+
+        Server update = getServer(serverName);
+        update.setName(request.name());
+        if (request.description().isEmpty() || request.description().isBlank())
+            update.setName(request.description());
+
+        return true;
     }
 
+    public boolean updateMemberRole(String username, String serverName, String memberUsername, ServerRole role) {
+        boolean isAllowed = isAllowed(username, serverName, List.of(ServerRole.OWNER, ServerRole.CONTROLLER));
+        boolean isMember = serverUserRepo.existsByUser_idAndServer_id(getUserId(memberUsername),getServerId(serverName));
+        if (!isMember || !isAllowed)
+            return false;
+
+        ServerUser update = serverUserRepo.findByUser_idAndServer_id(getUserId(memberUsername), getServerId(serverName))
+                .orElseThrow(()->new NotFound(memberUsername + " is Not a Member"));
+        update.setRole(role);
+        serverUserRepo.save(update);
+        return true;
+    }
+
+    public boolean deleteServer(String username, String serverName) {
+        boolean isAllowed = isAllowed(username, serverName, List.of(ServerRole.OWNER));
+        if (!isAllowed)
+            return false;
+        serverRepo.delete(getServer(serverName));
+        return true;
+    }
+
+    public boolean removeMember(String username, String serverName, String memberUsername) {
+        boolean isAllowed = isAllowed(username, serverName, List.of(ServerRole.OWNER, ServerRole.CONTROLLER));
+        if (!isAllowed)
+            return false;
+        ServerUser serverUser = serverUserRepo.findByUser_idAndServer_id(getUserId(username), getServerId(serverName))
+                        .orElseThrow(()->new NotFound(memberUsername + " is Not a Member"));
+        serverUserRepo.delete(serverUser);
+        return true;
+    }
 }

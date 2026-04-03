@@ -80,4 +80,5 @@ public class AppUser {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ServerUser> serverUser;
+
 }
