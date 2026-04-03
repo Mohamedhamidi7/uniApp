@@ -157,7 +157,7 @@ public class ServerService {
     }
 
     public boolean updateMemberRole(String username, String serverName, String memberUsername, ServerRole role) {
-        boolean isAllowed = isAllowed(username, serverName, List.of(ServerRole.OWNER, ServerRole.CONTROLLER));
+        boolean isAllowed = isAllowed(username, serverName, List.of(ServerRole.OWNER));
         boolean isMember = serverUserRepo.existsByUser_idAndServer_id(getUserId(memberUsername),getServerId(serverName));
         if (!isMember || !isAllowed)
             return false;
