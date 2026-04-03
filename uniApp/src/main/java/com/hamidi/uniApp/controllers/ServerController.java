@@ -11,23 +11,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/private/servers")
+@RequestMapping("/private")
 @RequiredArgsConstructor
 public class ServerController {
 
     private final ServerService serverService;
 
-    @GetMapping("/{serverName}")
+    @GetMapping("/servers/{serverName}")
     public ServerDTO getServerByName(@PathVariable String serverName){
         return serverService.getServerByName(serverName);
     }
 
-    @GetMapping("/me")
+    @GetMapping("/servers")
     public List<ServerDTO> getEnteredServers(Authentication authentication){
         return serverService.getEnteredServers(authentication.getName());
     }
 
-    @GetMapping("/{serverName}/members")
+    @GetMapping("/servers/{serverName}/members")
     public List<ServerMemberDTO> getServerMembers(
             Authentication authentication,
             @PathVariable String serverName
@@ -35,7 +35,7 @@ public class ServerController {
         return serverService.getServerMembers(authentication.getName(), serverName);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/servers")
     public boolean createServer(
             Authentication authentication,
             @RequestBody ServerDTO request
@@ -43,16 +43,16 @@ public class ServerController {
             return serverService.createServer(authentication.getName(), request);
     }
 
-    @PostMapping("/{serverName}/members/add-")
+    @PostMapping("/servers/{serverName}/members/{username}")
     public boolean addUserToServer(
             Authentication authentication,
             @PathVariable String serverName,
-            @RequestParam String username
+            @PathVariable String username
     ){
         return serverService.addUserToServer(authentication.getName(), serverName, username);
     }
 
-    @PutMapping("/{serverName}")
+    @PutMapping("/servers/{serverName}")
     public boolean updateServer(
             Authentication authentication,
             @PathVariable String serverName,
@@ -61,17 +61,17 @@ public class ServerController {
         return serverService.updateServer(authentication.getName(), serverName, request);
     }
 
-    @PutMapping("/{serverName}/members/update-role-")
+    @PutMapping("/servers/{serverName}/members/{username}")
     public boolean updateMemberRole(
             Authentication authentication,
             @PathVariable String serverName,
-            @RequestParam String username,
+            @PathVariable String username,
             @RequestParam ServerRole role
     ){
         return serverService.updateMemberRole(authentication.getName(), serverName, username, role);
     }
 
-    @DeleteMapping("/{serverName}")
+    @DeleteMapping("/servers/{serverName}")
     public boolean deleteServer(
             Authentication authentication,
             @PathVariable String serverName
@@ -79,11 +79,11 @@ public class ServerController {
         return serverService.deleteServer(authentication.getName(), serverName);
     }
 
-    @DeleteMapping("/{serverName}/members/remove-")
+    @DeleteMapping("/servers/{serverName}/members/{username}")
     public boolean removeMember(
             Authentication authentication,
             @PathVariable String serverName,
-            @RequestParam String username
+            @PathVariable String username
     ){
         return serverService.removeMember(authentication.getName(), serverName, username);
     }
